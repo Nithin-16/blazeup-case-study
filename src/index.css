@@ -1,0 +1,5 @@
+/* Reset default Vite starter styles - styled via styles.css */
+#root {
+  min-height: 100vh;
+  width: 100%;
+}

@@ -1,0 +1,312 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  --bg-space: #F9FAFB;
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --text-main: #111827;
+  --text-muted: #4B5563;
+  --accent: #FF5C00;
+  --glow: rgba(255, 92, 0, 0.04);
+  --shadow-glass: 0 32px 64px rgba(0, 0, 0, 0.05);
+  --layer-mid-bg: rgba(255, 255, 255, 0.8);
+  --toggle-bg: #111118;
+  --toggle-icon: #FFFFFF;
+}
+
+[data-theme="dark"] {
+  --bg-space: #121212;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-main: #F3F4F6;
+  --text-muted: #D1D5DB;
+  --accent: #FF5C00;
+  --glow: rgba(255, 92, 0, 0.3);
+  --shadow-glass: 0 32px 64px rgba(0, 0, 0, 0.4);
+  --layer-mid-bg: rgba(255, 255, 255, 0.05);
+  --toggle-bg: #FFFFFF;
+  --toggle-icon: #111118;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-space);
+  color: var(--text-main);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  padding-bottom: 120px;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.bg-glow {
+  position: fixed;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  height: 80vh;
+  background: radial-gradient(circle, var(--glow) 0%, rgba(0, 0, 0, 0) 60%);
+  filter: blur(120px);
+  z-index: -1;
+  pointer-events: none;
+  transition: background 0.5s ease;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-main);
+  transition: color 0.5s ease;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: clamp(3rem, 6vw, 5rem);
+}
+
+h2 {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  margin-bottom: 1em;
+  transition: color 0.5s ease;
+}
+
+/* Explicit alignment fixes */
+.text-center {
+  text-align: center;
+}
+
+.text-constraint p {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Force standard left-alignment inside grids to prevent cascading issues */
+.glass-card {
+  text-align: left;
+}
+
+.glass-card p {
+  max-width: none;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 5%;
+  position: relative;
+}
+
+/* Global Image Scaling */
+img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-glass);
+  transition: transform 0.4s ease, border-color 0.4s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.glass-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+}
+
+.glass-card.accent {
+  border-color: rgba(255, 92, 0, 0.4);
+  background: linear-gradient(180deg, rgba(255, 92, 0, 0.05) 0%, var(--glass-bg) 100%);
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.tag.accent {
+  background: rgba(255, 92, 0, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(255, 92, 0, 0.3);
+}
+
+.tag.muted {
+  background: var(--glass-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--glass-border);
+}
+
+/* Layouts */
+section {
+  padding: 120px 0;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.sticky-split {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.sticky-col {
+  position: sticky;
+  top: 120px;
+  text-align: left;
+}
+
+.zoomable {
+  cursor: zoom-in;
+  transition: filter 0.3s ease;
+}
+
+.zoomable:hover {
+  filter: brightness(1.1);
+}
+
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  cursor: zoom-out;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  image-rendering: auto;
+}
+
+/* Icon Fix: Removed background, border, and padding */
+.icon-wrap {
+  display: inline-flex;
+  margin-bottom: 24px;
+  color: var(--accent);
+}
+
+.theme-toggle {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--toggle-bg);
+  color: var(--toggle-icon);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1) translateY(-4px);
+}
+
+@media (max-width: 992px) {
+
+  .grid-2,
+  .grid-3,
+  .split-layout,
+  .sticky-split {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .sticky-col {
+    position: relative;
+    top: 0;
+  }
+}

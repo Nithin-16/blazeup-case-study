@@ -795,3 +795,175 @@ section {
     right: 10px;
   }
 }
+
+/* ==========================================================================
+   NDA Password Protection Gate
+   ========================================================================== */
+.password-gate-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.password-gate-card {
+  max-width: 480px;
+  width: 100%;
+  padding: 48px 36px;
+  border-radius: 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeInGate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInGate {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.password-gate-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 92, 0, 0.1);
+  border: 1px solid rgba(255, 92, 0, 0.25);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.password-form {
+  width: 100%;
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.password-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.password-input {
+  width: 100%;
+  padding: 14px 44px 14px 18px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .password-input {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.password-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 92, 0, 0.2);
+}
+
+.password-input.error {
+  border-color: #EF4444;
+  animation: shakeInput 0.4s ease;
+}
+
+@keyframes shakeInput {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.password-toggle-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle-eye:hover {
+  color: var(--text-main);
+}
+
+.password-submit-btn {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 20px -4px rgba(255, 92, 0, 0.4);
+}
+
+.password-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -4px rgba(255, 92, 0, 0.5);
+}
+
+.password-submit-btn:active {
+  transform: translateY(0);
+}
+
+.password-error-text {
+  font-size: 0.82rem;
+  color: #EF4444;
+  margin: 4px 0 0;
+  text-align: left;
+}
+
+.lock-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 90px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--toggle-bg);
+  color: var(--toggle-icon);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-glass);
+  z-index: 1000;
+  transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.lock-toggle:hover {
+  transform: scale(1.1) translateY(-3px);
+}

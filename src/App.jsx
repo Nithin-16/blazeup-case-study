@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import {
   Layers, ShieldCheck, Zap, Database,
   Users, Activity, BrainCircuit, CheckCircle, Sun, Moon, X, AlertTriangle,
-  ArrowLeftRight
+  ArrowLeftRight, Lock, Eye, EyeOff, ArrowRight
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,6 +10,9 @@ import { useGSAP } from "@gsap/react";
 import "./styles.css";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Passcode for NDA-protected case study (case-insensitive)
+const ACCESS_PASSWORD = "blazeup";
 
 const IconWrap = ({ IconComponent }) => (
   <div className="icon-wrap">
@@ -109,6 +112,42 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
   const [lightboxImg, setLightboxImg] = useState(null);
 
+  // Authentication State for NDA protection
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("blazeup_nda_unlocked") === "true";
+  });
+  const [passwordInput, setPasswordInput] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  // Auto-unlock via URL query parameter (e.g., ?pass=blazeup)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pass = params.get("pass");
+    if (pass && pass.trim().toLowerCase() === ACCESS_PASSWORD.toLowerCase()) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem("blazeup_nda_unlocked", "true");
+    }
+  }, []);
+
+  const handleUnlock = (e) => {
+    if (e) e.preventDefault();
+    if (passwordInput.trim().toLowerCase() === ACCESS_PASSWORD.toLowerCase()) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem("blazeup_nda_unlocked", "true");
+      setHasError(false);
+    } else {
+      setHasError(true);
+    }
+  };
+
+  const handleLock = () => {
+    sessionStorage.removeItem("blazeup_nda_unlocked");
+    setIsAuthenticated(false);
+    setPasswordInput("");
+    setHasError(false);
+  };
+
   useEffect(() => {
     if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark');
@@ -123,6 +162,7 @@ export default function App() {
   }, [lightboxImg]);
 
   useGSAP(() => {
+    if (!isAuthenticated) return;
     gsap.from(".reveal-text", { y: 50, opacity: 0, duration: 1, stagger: 0.2, ease: "power4.out" });
     gsap.utils.toArray('.reveal-scroll').forEach((elem) => {
       gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 85%" }, y: 50, opacity: 0, duration: 0.9, ease: "power3.out" });
@@ -130,7 +170,8 @@ export default function App() {
     gsap.utils.toArray('.glass-card').forEach((card) => {
       gsap.from(card, { scrollTrigger: { trigger: card, start: "top 90%" }, y: 35, opacity: 0, duration: 0.8, ease: "power2.out" });
     });
-  }, { scope: mainRef });
+    ScrollTrigger.refresh();
+  }, { scope: mainRef, dependencies: [isAuthenticated] });
 
   return (
     <div ref={mainRef}>
@@ -152,7 +193,72 @@ export default function App() {
       <div className="noise-overlay"></div>
       <div className="bg-glow"></div>
 
-      <div className="container">
+      {!isAuthenticated ? (
+        <div className="password-gate-container">
+          <div className="password-gate-card">
+            <div className="password-gate-icon">
+              <Lock size={32} />
+            </div>
+            <span className="tag accent" style={{ marginBottom: "16px" }}>Confidential / Under NDA</span>
+            <h2 style={{ fontSize: "1.75rem", marginBottom: "10px" }}>Protected Case Study</h2>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", lineHeight: 1.6, margin: 0, maxWidth: "380px" }}>
+              This project contains proprietary enterprise workflows and designs subject to a Non-Disclosure Agreement. Please enter the passcode to view.
+            </p>
+
+            <form className="password-form" onSubmit={handleUnlock}>
+              <div className="password-input-wrap">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`password-input ${hasError ? "error" : ""}`}
+                  placeholder="Enter passcode..."
+                  value={passwordInput}
+                  onChange={(e) => {
+                    setPasswordInput(e.target.value);
+                    if (hasError) setHasError(false);
+                  }}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  className="password-toggle-eye"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              {hasError && (
+                <p className="password-error-text">
+                  Incorrect passcode. Please contact the designer to request access.
+                </p>
+              )}
+
+              <button type="submit" className="password-submit-btn">
+                <span>Unlock Case Study</span>
+                <ArrowRight size={18} />
+              </button>
+            </form>
+
+            <div style={{ marginTop: "24px", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+              Are you a recruiter or hiring manager? Contact the designer to request the passcode.
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Re-lock Button (Floating next to theme toggle) */}
+          <button
+            className="lock-toggle"
+            onClick={handleLock}
+            aria-label="Lock Case Study"
+            title="Lock Case Study (NDA Protected)"
+          >
+            <Lock size={20} />
+          </button>
+
+          <div className="container">
         {/* SECTION 1: HERO */}
         <section className="hero text-center" style={{ padding: "160px 0 100px", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <span className="tag accent reveal-text">India's Best Design Project 2026</span>
@@ -463,37 +569,39 @@ export default function App() {
 
       </div>
 
-      {/* LIGHTBOX MODAL */}
-      {lightboxImg && (
-        <div className="lightbox-overlay" onClick={() => setLightboxImg(null)}>
-          <button
-            style={{
-              position: 'absolute',
-              top: 28,
-              right: 28,
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
-              padding: '10px',
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'background 0.2s ease'
-            }}
-            onClick={() => setLightboxImg(null)}
-            aria-label="Close Lightbox"
-          >
-            <X size={24} />
-          </button>
-          <img
-            src={lightboxImg}
-            alt="Expanded UI Mockup"
-            className="lightbox-img"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
+          {/* LIGHTBOX MODAL */}
+          {lightboxImg && (
+            <div className="lightbox-overlay" onClick={() => setLightboxImg(null)}>
+              <button
+                style={{
+                  position: 'absolute',
+                  top: 28,
+                  right: 28,
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '50%',
+                  padding: '10px',
+                  color: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background 0.2s ease'
+                }}
+                onClick={() => setLightboxImg(null)}
+                aria-label="Close Lightbox"
+              >
+                <X size={24} />
+              </button>
+              <img
+                src={lightboxImg}
+                alt="Expanded UI Mockup"
+                className="lightbox-img"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
